@@ -30,11 +30,13 @@ func checkError(err error) {
 	}
 }
 
+// Database manages file access through bolt.DB connection and a file lock
 type Database struct {
 	db    *bolt.DB
 	glock *golock.Lock
 }
 
+// Open opens(or creates) bolt database file
 func (self *Database) Open(db_file string) error {
 	if nil != self.db {
 		self.Close()
@@ -66,6 +68,7 @@ func (self *Database) Open(db_file string) error {
 	return err
 }
 
+// Close close database connection and remove file lock
 func (self *Database) Close() {
 	self.db.Close()
 
@@ -76,6 +79,7 @@ func (self *Database) Close() {
 	}
 }
 
+// CreateTable creates a bucket in the bolt database
 func (self *Database) CreateTable(table_name string) error {
 	return self.db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(table_name))
@@ -83,6 +87,8 @@ func (self *Database) CreateTable(table_name string) error {
 	})
 }
 
+// Get retrieves a key from a bucket.
+// Decrypts the value using the supplied passphrase.
 func (self *Database) Get(table, key, passphrase string) (string, error) {
 	if nil == self.db {
 		return "", errors.New("Database not opened")
@@ -112,6 +118,8 @@ func (self *Database) Get(table, key, passphrase string) (string, error) {
 	})
 }
 
+// Set saves a key value to a bucket.
+// Encrypts the value using the supplied passphrase.
 func (self *Database) Set(table, key, value, passphrase string) error {
 	if nil == self.db {
 		return errors.New("Database not opened")
@@ -134,6 +142,7 @@ func (self *Database) Set(table, key, value, passphrase string) error {
 	})
 }
 
+// Keys lists all keys with in a bucket
 func (self *Database) Keys(table string) ([]string, error) {
 	var result []string
 	if nil == self.db {
@@ -151,6 +160,7 @@ func (self *Database) Keys(table string) ([]string, error) {
 	})
 }
 
+// Remove deletes a key from a bucket
 func (self *Database) Remove(table string, key string, passphrase string) error {
 	return self.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(table))
@@ -166,6 +176,7 @@ func (self *Database) Remove(table string, key string, passphrase string) error 
 	})
 }
 
+// Tables returns list of buckets
 func (self *Database) Tables() ([]string, error) {
 	var result []string
 	if nil == self.db {
@@ -179,6 +190,7 @@ func (self *Database) Tables() ([]string, error) {
 	})
 }
 
+// OpenDb opens bolt file and returns Database
 func OpenDb(db_file string) Database {
 	db := Database{}
 	db.Open(db_file)
