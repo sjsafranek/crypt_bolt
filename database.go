@@ -17,9 +17,11 @@ import (
 	"github.com/schollz/golock"
 )
 
-const DEFAULT_DB_FILE = "bolt.db"
-
-var DB_FILE string = DEFAULT_DB_FILE
+// // DEFAULT_DB_FILE default database file
+// const DEFAULT_DB_FILE = "bolt.db"
+//
+// // DB_FILE database file to use
+// var DB_FILE string = DEFAULT_DB_FILE
 
 func checkError(err error) {
 	if err != nil {
