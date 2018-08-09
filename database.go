@@ -1,4 +1,4 @@
-package cryptic_bolt
+package crypt_bolt
 
 import (
 	"errors"
